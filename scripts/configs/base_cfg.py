@@ -84,6 +84,33 @@ class BaseConfig:
             return asdict(self)
     
     @dataclass
+    class ModelOptimizerConfig:
+        learning_rate: float = 1.0e-3
+        weight_decay: float = 0.0
+
+        def to_dict(self):
+            return asdict(self)
+
+    @dataclass
+    class ModelTrainingConfig:
+        save_interval: int = 200
+        max_iterations: int = 500
+        batch_size: int = 1024
+        eval_traj_noise_scale: List[float] = field(default_factory=lambda: [0.1, 0.2, 0.4, 0.5, 0.8])
+        system_dynamics_loss_weights: Dict[str, float] = field(default_factory=lambda: {
+            "state": 1.0,
+            "sequence": 1.0,
+            "bound": 1.0,
+            "kl": 0.1,
+            "extension": 1.0,
+            "contact": 1.0,
+            "termination": 1.0
+            })
+
+        def to_dict(self):
+            return asdict(self)
+    
+    @dataclass
     class PolicyArchitectureConfig:
         observation_dim: int = 0
         obs_groups: Dict[str, List[str]] = field(default_factory=lambda: {"policy": ["policy"]})
@@ -132,6 +159,8 @@ class BaseConfig:
     environment_config: EnvironmentConfig = field(default_factory=EnvironmentConfig)
     data_config: DataConfig = field(default_factory=DataConfig)
     model_architecture_config: ModelArchitectureConfig = field(default_factory=ModelArchitectureConfig)
+    model_optimizer_config: ModelOptimizerConfig = field(default_factory=ModelOptimizerConfig)
+    model_training_config: ModelTrainingConfig = field(default_factory=ModelTrainingConfig)
     policy_architecture_config: PolicyArchitectureConfig = field(default_factory=PolicyArchitectureConfig)
     policy_algorithm_config: PolicyAlgorithmConfig = field(default_factory=PolicyAlgorithmConfig)
     policy_training_config: PolicyTrainingConfig = field(default_factory=PolicyTrainingConfig)

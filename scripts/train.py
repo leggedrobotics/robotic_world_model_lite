@@ -1,5 +1,6 @@
 from configs import BaseConfig, AnymalDFlatConfig
 from envs import BaseEnv, AnymalDFlatEnv
+from model_training import ModelTraining
 from policy_training import PolicyTraining
 from rsl_rl.modules import ActorCritic, SystemDynamicsEnsemble
 from rsl_rl.algorithms import PPO
@@ -220,6 +221,36 @@ class ModelBasedExperiment:
         self.env.set_system_dynamics(self.system_dynamics)
             
 
+    def prepare_model_optimizer(self, learning_rate, weight_decay):
+        self.model_optimizer = torch.optim.Adam(
+            self.system_dynamics.parameters(),
+            lr=learning_rate,
+            weight_decay=weight_decay,
+            )
+
+
+    def train_model(self, log_dir, batch_size, eval_traj_noise_scale, system_dynamics_loss_weights, save_interval, max_iterations):
+        print(f"[Train Model] Training model for {max_iterations} iterations.")
+        model_training = ModelTraining(
+            log_dir,
+            self.history_horizon,
+            self.forecast_horizon,
+            self.dataset,
+            self.system_dynamics,
+            device=self.device,
+            optimizer=self.model_optimizer,
+            eval_traj_config=self.eval_traj_config,
+            batch_size=batch_size,
+            eval_traj_noise_scale=eval_traj_noise_scale,
+            system_dynamics_loss_weights=system_dynamics_loss_weights,
+            save_interval=save_interval,
+            max_iterations=max_iterations,
+            )
+        model_training.current_learning_iteration = self.model_learning_iteration
+        model_training.train()
+        self.model_learning_iteration += model_training.max_iterations
+
+
     def prepare_policy(self, observation_dim, obs_groups, action_dim, actor_hidden_dims, critic_hidden_dims, activation, init_noise_std, resume_path=None):
         self.observation_dim = observation_dim
         default_sets = ["critic"]
@@ -285,9 +316,11 @@ def run_experiment(config: BaseConfig):
     model_experiment = ModelBasedExperiment(**config.experiment_config.to_dict())
     model_experiment.prepare_environment(**config.environment_config.to_dict())
     model_experiment.prepare_model(**config.model_architecture_config.to_dict())
+    # model_experiment.prepare_model_optimizer(**config.model_optimizer_config.to_dict())
     model_experiment.prepare_policy(**config.policy_architecture_config.to_dict())
     model_experiment.prepare_algorithm(**config.policy_algorithm_config.to_dict())
     model_experiment.prepare_data(**config.data_config.to_dict())
+    # model_experiment.train_model(log_dir, **config.model_training_config.to_dict())
     model_experiment.train_policy(log_dir, **config.policy_training_config.to_dict())
     print(f"Training completed. Policy saved to {log_dir}.")
 

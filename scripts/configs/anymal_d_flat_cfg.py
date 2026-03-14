@@ -84,6 +84,15 @@ class AnymalDFlatConfig(BaseConfig):
         resume_path: str | None = "assets/models/pretrain_rnn_ens.pt"
     
     @dataclass
+    class ModelOptimizerConfig(BaseConfig.ModelOptimizerConfig):
+        learning_rate: float = 1.0e-4
+        weight_decay: float = 1.0e-5
+    
+    @dataclass
+    class ModelTrainingConfig(BaseConfig.ModelTrainingConfig):
+        pass
+    
+    @dataclass
     class PolicyArchitectureConfig(BaseConfig.PolicyArchitectureConfig):
         observation_dim: int = 48
         action_dim: int = 12
@@ -103,6 +112,8 @@ class AnymalDFlatConfig(BaseConfig):
     environment_config: EnvironmentConfig = field(default_factory=EnvironmentConfig)
     data_config: DataConfig = field(default_factory=DataConfig)
     model_architecture_config: ModelArchitectureConfig = field(default_factory=ModelArchitectureConfig)
+    model_optimizer_config: ModelOptimizerConfig = field(default_factory=ModelOptimizerConfig)
+    model_training_config: ModelTrainingConfig = field(default_factory=ModelTrainingConfig)
     policy_architecture_config: PolicyArchitectureConfig = field(default_factory=PolicyArchitectureConfig)
     policy_algorithm_config: PolicyAlgorithmConfig = field(default_factory=PolicyAlgorithmConfig)
     policy_training_config: PolicyTrainingConfig = field(default_factory=PolicyTrainingConfig)
