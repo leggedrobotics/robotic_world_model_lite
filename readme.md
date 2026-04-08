@@ -130,8 +130,8 @@ If you find this repository useful for your research, please consider citing:
   journal={arXiv preprint arXiv:2501.10100},
   year={2025}
 }
-@article{li2025offline,
-  title={Offline Robotic World Model: Learning Robotic Policies without a Physics Simulator},
+@article{li2025uncertainty,
+  title={Uncertainty-Aware Robotic World Model Makes Offline Model-Based Reinforcement Learning Work on Real Robots},
   author={Li, Chenhao and Krause, Andreas and Hutter, Marco},
   journal={arXiv preprint arXiv:2504.16680},
   year={2025}
